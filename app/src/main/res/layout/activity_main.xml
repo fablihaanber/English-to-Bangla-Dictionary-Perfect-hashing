@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+
+    android:background="@drawable/loginsignup"
+
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="66dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:orientation="vertical"
+        >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="72dp"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="center_horizontal"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dictionary!"
+
+                android:fontFamily="@font/berlin_sans_fb_regular"
+                android:textColor=" #fdddf9"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                ></TextView>
+
+
+        </LinearLayout>
+
+
+        <EditText
+            android:id="@+id/input"
+            android:layout_marginTop="4dp"
+            android:textCursorDrawable="@drawable/color_cursor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#feeffc"
+            android:backgroundTint="#feeffc"
+            android:hint="Enter the word in English"
+            android:textColorHint="#7b3c77"
+            android:layout_marginBottom="8dp"
+            android:text=""
+            android:textSize="20sp"
+            android:maxLength="61"
+
+            android:inputType="textEmailAddress"
+            android:fontFamily="@font/berlin_sans_fb_regular"
+
+
+            ></EditText>
+
+        <Button
+            android:id="@+id/translate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="40dp"
+            android:padding="12dp"
+            android:text="Translate to Bangla"
+            android:fontFamily="@font/berlin_sans_fb_regular"
+            android:textSize="18sp"
+            android:textColor="#feeffc"
+            android:textAllCaps="false"
+            android:backgroundTint="#7E0977"
+            ></Button>
+
+        <TextView
+            android:id="@+id/noword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:text="Word not found"
+            android:gravity="center"
+            android:textSize="19dp"
+            android:fontFamily="@font/berlin_sans_fb_regular"
+            android:textColor="#813f7D"
+            android:visibility="invisible"
+
+            ></TextView>
+
+    </LinearLayout>
+    //#40013d
+    <!--
+        <ProgressBar
+            android:id="@+id/progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />-->
+
+</RelativeLayout>
