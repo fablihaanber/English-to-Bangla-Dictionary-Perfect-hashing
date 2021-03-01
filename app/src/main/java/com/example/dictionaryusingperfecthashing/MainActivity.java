@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,26 +33,12 @@ class WordList{
 }
 class Hashtable{
 
-
+    long a;
+    long b;
     int length;
-
-    long[][]secondHashTable;
-    int[] i;
-
-
-    Word word;
 
     Hashtable(int length){
         this.length = length;
-    }
-    Hashtable(long secondHashTable[][]){
-        this.secondHashTable = secondHashTable;
-    }
-    Hashtable(int[] i){
-        this.i = i;
-    }
-    public Hashtable(Word word) {
-        this.word = word;
     }
 
     public int getLength() {
@@ -62,43 +49,33 @@ class Hashtable{
         this.length = length;
     }
 
-    public long[][] getSecondHashTable() {
-        return secondHashTable;
+    public long getA() {
+        return a;
     }
 
-    public void setSecondHashTable(long[][] secondHashTable) {
-        this.secondHashTable = secondHashTable;
+    public void setA(long a) {
+        this.a = a;
     }
 
-    public int[] getI() {
-        return i;
+    public long getB() {
+        return b;
     }
 
-    public void setI(int[] i) {
-        this.i = i;
-    }
-
-    public Word getWord() {
-        return word;
-    }
-
-    public void setWord(Word word) {
-        this.word = word;
+    public void setB(long b) {
+        this.b = b;
     }
 }
+
 
 class Word{
     String en;
     String bn;
     int primaryHash;
+    int secondaryHash;
 
     Word(String en, String bn){
         this.en = en;
         this.bn = bn;
-    }
-
-    Word(int primaryHash) {
-        this.primaryHash = primaryHash;
     }
 
 
@@ -125,21 +102,32 @@ class Word{
     public void setPrimaryHash(int primaryHash) {
         this.primaryHash = primaryHash;
     }
+
+    public int getSecondaryHash() {
+        return secondaryHash;
+    }
+
+    public void setSecondaryHash(int secondaryHash) {
+        this.secondaryHash = secondaryHash;
+    }
 }
 
 
 public class MainActivity extends AppCompatActivity {
     //declaring the xml fields
-    SearchView search;
     Button translate;
     EditText input;
-    TextView noWord;
-    boolean isWordValid = true;
+    TextView MeaningWord, foundWord;
+
     WordList dictionary = new WordList();
     int base = 256;
     static long prime = 999999999989L; //12 digit prime declaration
     long initiala = -1;
     long initialb= -1 ;
+    int[] count;
+    int[][] hash_arr;
+    Word[] word;
+    Hashtable[] hashtable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,7 +136,9 @@ public class MainActivity extends AppCompatActivity {
 
         translate =  findViewById(R.id.translate); //the button translate to bangla
         input = findViewById(R.id.input); //the word to be searched for taken from the user
-        noWord = findViewById(R.id.noword);
+        MeaningWord = findViewById(R.id.noword);
+        foundWord = findViewById(R.id.Foundword);
+
         final String[] inputText = new String[1];// input text taken from the user
 
         try{
@@ -162,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
             dictionary.size = dictionary.words.length();
 
             //create array of word object
-            Word[] word = new Word[dictionary.size] ;
+            word = new Word[dictionary.size] ;
             long max = 0;
             String strr = "";
             for(int i=0;i<dictionary.size;i++){
@@ -177,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-            generateHashTable(dictionary.size, word);
+            generateHashTable(dictionary.size);
 
 
 
@@ -189,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        final long[] key = new long[1];
+
         translate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -198,28 +188,11 @@ public class MainActivity extends AppCompatActivity {
                 long firstKey = getFirstKey(inputText[0]);
                 int primaryHash = getPrimaryHash(inputText[0],dictionary.size);
                 String str = String.valueOf(primaryHash);
-                Toast.makeText(getApplicationContext(),str,Toast.LENGTH_LONG).show();/*
+                String theWord = search(inputText[0],dictionary.size);
+                foundWord.setText(theWord);
+                foundWord.setVisibility(View.VISIBLE);
+                MeaningWord.setVisibility(View.VISIBLE);
 
-
-
-                for(int i=0;i<dictionary.size;i++){
-                    try {
-                    String en = dictionary.words.getJSONObject(i).getString("en");
-                    if(en.equals(inputText[0])){
-                        long primary = getPrimaryHash(en,dictionary.size);
-                        String strla = String.valueOf(primary);
-                        Toast.makeText(getApplicationContext(),strla,Toast.LENGTH_LONG).show();
-                    }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }*/
-
-                //}
-                //sjdkasjsjdlasjdlaksjdl
-
-                //get_json(word);
-                //dump();
 
             }
         });
@@ -296,16 +269,15 @@ public class MainActivity extends AppCompatActivity {
     //this fuction will generate a second unique key in case of secondary hashing
 
     long getSecondKey(long random_a,long random_b,int  m, String string){
+
         long firstkey = this.getFirstKey(string);
         BigInteger BigfirstKey = BigInteger.valueOf(firstkey);
-        //BigInteger slotsize = BigInteger.valueOf(m);
         BigInteger a = BigInteger.valueOf(random_a);
         BigInteger b = BigInteger.valueOf(random_b);
-
-        BigInteger ak1 = a.multiply(BigfirstKey);
-        BigInteger ak1plusb = ak1.add(b);
+        BigInteger ak1 = a.multiply(BigfirstKey);   //ak'
+        BigInteger ak1plusb = ak1.add(b);           //ak'+b
         BigInteger p =BigInteger.valueOf(prime);
-        BigInteger Bigsecondkey = ak1plusb.mod(p);  //ak'+b
+        BigInteger Bigsecondkey = ak1plusb.mod(p);  //(ak'+b)%p
         long secondkey = Bigsecondkey.longValue();
 
 
@@ -318,173 +290,168 @@ public class MainActivity extends AppCompatActivity {
     int getSecondaryHash(long a,long  b,int  m,String string){
 
         long secondkey = this.getSecondKey(a,b,m,string);
-        BigInteger BigSecondKey = BigInteger.valueOf(secondkey);
+        BigInteger BigSecondKey = BigInteger.valueOf(secondkey);  //(ak'+b)%p
         BigInteger slotsize = BigInteger.valueOf(m);
-        BigInteger bigSecondaryHash = BigSecondKey.mod(slotsize);
+        BigInteger bigSecondaryHash = BigSecondKey.mod(slotsize); //((ak'+b)%p)%m where m is the slot size of the hash table index
         int secondaryhash = bigSecondaryHash.intValue();
 
-        return secondaryhash;  //((ak'+b)%p)%m where m is the square of the total number of words collided in the same slot
+        return secondaryhash;
 
     }
 
-    void generateHashTable(int dictionarySizey, Word[] wordy) {
+
+
+    void generateHashTable(int dictionarySizey) {
+
         int dictionarySize = dictionarySizey;
-        Word[] word = wordy;
-        ArrayList<Word> stringy=new ArrayList<Word>();
-        int[] count;
-        int[] count2;
-        count = new int[dictionarySize];
-        count2 = new int[dictionarySize];
-        Arrays.fill(count, 0);
-        Arrays.fill(count2, 0);
-        Hashtable[] hashtable = new Hashtable[dictionarySize];
 
-
+        //int[] count; //Count  will measure how many collisions are there where the keys have the same primary hash
         int maximumCollisions=0;
 
-
-
-
-        int save=0;
-        List<Integer>[] array = new ArrayList[dictionarySize];
+        count = new int[dictionarySize];
 
         for(int i=0;i<dictionarySize;i++){
+            count[i] = 0;
+        }
 
+        hashtable = new Hashtable[dictionarySize];
+        int[][] arrayCollidedWords = new int[dictionarySize][500]; //this array will store the indices of collided keys for that particullar hash function and the space 500 is specified randomly to avoid null reference
+
+
+        //looping through the indices of saved keys of dictionary
+        for(int i=0;i<dictionarySize;i++){
 
             word[i].en = word[i].en.toLowerCase();
             String string = word[i].getEn();
             int primaryHash = getPrimaryHash(string,dictionarySize);
-//            array[primaryHash].add(i);
-
-
-
+            int j_slot = count[primaryHash];
+            arrayCollidedWords[primaryHash][j_slot] = i;
             count[primaryHash]++;   //if count is greater than 1 for each primary hash index , then a primary hash index have been repeated twice and collision has been occured.
+
             if(count[primaryHash]>maximumCollisions){
                 maximumCollisions = count[primaryHash];
-                save = primaryHash;
             }
-            word[i] = new Word(primaryHash);
 
-
-
-
-
-
-
-
-
+            word[i].setPrimaryHash(primaryHash);
 
         }
-        //Toast.makeText(getApplicationContext(),String.valueOf(maximumCollisions),Toast.LENGTH_LONG).show();\
 
-
-
+        Toast.makeText(getApplicationContext(),word[1212].en,Toast.LENGTH_LONG).show();
 
         int max = 0;
-        String[][] myTwoDimensionalStringArray;
-        myTwoDimensionalStringArray = new String[dictionarySize][];
-        int[] hash_arr;
 
 
+        int size = maximumCollisions*maximumCollisions;
+        hash_arr = new int[dictionarySize][size+100];
 
+        String question = "";
+        int mamamama = 0;
+        //int question1 = 0;
+
+
+        //looping through the hash indices of the hash table
         for(int j=0;j<dictionarySize;j++){
 
 
-            int primaryHash = word[j].primaryHash;
-            myTwoDimensionalStringArray[primaryHash] = new String[count[primaryHash]];
-            myTwoDimensionalStringArray[primaryHash][count2[primaryHash]] = word[j].en;
-            count2[primaryHash]++;
+            long a,b;
+            int m;
+            //int primaryHash = word[j].primaryHash;
+            //SecondaryHashTable[] secondaryHash = new SecondaryHashTable()
+
+            int length = count[j]*count[j]; //this length is the size of each slot in the hash table
+            hashtable[j] = new Hashtable(length);
+
+            m=length;
 
             if(count[j]>=1){
 
-                int length = count[j]*count[j]; //this length is the size of each slot in the hash table
-                hashtable[j] = new Hashtable(length);
-                if(hashtable[j].length>max)max = j;
+                    if (count[j] == 1) {    //if there is only one element in the hash slot
+                        a = 0;
+                        b = 0;
+                        m = 1;
+                        int index = arrayCollidedWords[j][0];  //Here,j is the index of the word that did not collide
+                        int secondaryHash = getSecondaryHash(a,b,m,word[index].en);
+                        word[index].setSecondaryHash(secondaryHash);
+                        hashtable[j].setA(a);
+                        hashtable[j].setB(b);
+                    }
+
+                else{
+                    int[] secondaryHashSlotTable = new int[m];
+                    for(int i=0;i<count[j];i++){
+
+                        int index = arrayCollidedWords[j][i];
+                        a = (long) (1+ Math.floor(Math.random()*(prime-1)));
+                        b = (long) Math.floor(Math.random()*prime);
+                        int secondaryHash = getSecondaryHash(a,b,m,word[index].en);
 
 
+                        if(secondaryHashSlotTable[secondaryHash]==0){
+                            word[index].setSecondaryHash(secondaryHash);
+
+                        }
+                        else{
+                            for(int slot=0;slot<m;slot++){
+                                secondaryHashSlotTable[slot] =0;
+                            }
+                            i = 0;
+                            continue;
+                        }
+                        word[index].setSecondaryHash(secondaryHash);
+                        hashtable[j].setA(a);
+                        hashtable[j].setB(b);
+
+                    }
 
 
-                int[] secondaryKeysSize;
-                secondaryKeysSize = new int[length];
-                Arrays.fill(secondaryKeysSize,0);
-
-
-                //secondaryKeysSize = (array[primaryHash]).stream().mapToInt(i -> i).toArray();
-                hashtable[j] = new Hashtable(secondaryKeysSize);
-
+                }
             }
 
         }
-        /*ArrayList string = new ArrayList<>();
-        for(int i=0;i<count[save];i++){
-            string.add(myTwoDimensionalStringArray[save][i]);
-        }*/
 
-        //Toast.makeText(getApplicationContext(),String.valueOf(string),Toast.LENGTH_LONG).show();
+        for(int i=0;i<dictionarySize;i++){
+            int pHash = word[i].getPrimaryHash();
+            int sHash = word[i].getSecondaryHash();
+            hash_arr[pHash][sHash] = i;
+
+        }
+
+    }
+
+    String  search(String searchWord, int dictionarySize){
+        String theWord = "";
+        int inputPHash = getPrimaryHash(searchWord,dictionarySize);
+        if(count[inputPHash]==0){
+            String str = "Word not found";
+            //Toast.makeText(getApplicationContext(),str,Toast.LENGTH_LONG).show();
+            theWord = str;
+        }
+        if(count[inputPHash]==1){
+            int key = hash_arr[inputPHash][0];
+            String string = word[key].en;
+            if(string.equals(searchWord)){
+                //Toast.makeText(getApplicationContext(),word[key].bn,Toast.LENGTH_LONG).show();
+                theWord = word[key].bn;
+            }
+
+        }
+        if(count[inputPHash]>1){
+
+            long a = hashtable[inputPHash].getA();
+            long b =hashtable[inputPHash].getB();
+            int m = hashtable[inputPHash].length;
+            int inputSHash = getSecondaryHash(a,b,m,searchWord);
+            int key = hash_arr[inputPHash][inputSHash];
+            String string = word[key].en;
+            if(string.equals(searchWord)){
+                //Toast.makeText(getApplicationContext(),word[key].bn,Toast.LENGTH_LONG).show();
+                theWord = word[key].bn;
+            }
+        }
+        return theWord;
 
 
     }
 
-
-
-
-     /*public void get_json(String word){
-         long count = 0;
-        String json;
-        try{
-            InputStream is = getAssets().open("E2Bdatabase.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-
-
-
-            json = new String(buffer,"UTF-8");
-            JSONArray jsonArray = new JSONArray(json);
-
-
-
-            long words = 0;
-            for(int i = 0; i < jsonArray.length(); i++){
-
-                JSONObject wordList = jsonArray.getJSONObject(i);
-
-                if(wordList.getString("en").equals(wordList)){
-                    numberofwordslist.add(wordList.getString("bn"));
-
-                }
-                if(wordList.getString("en")!= null){
-                    count++;
-                }
-
-            }
-                long length = jsonArray.length();
-                String len = String.valueOf(count);
-
-                Toast.makeText(getApplicationContext(),len,Toast.LENGTH_LONG).show();
-
-
-                numberofwordslist.clear();
-
-
-
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }catch(JSONException e){
-            e.printStackTrace();
-        }
-
-
-     }
-
-     public void dump(){
-         long[][] hello = new long[103655][100];
-         hello[10][25] = 999999999989L;
-         String jello = String.valueOf(hello[10][25]);
-         Toast.makeText(getApplicationContext(),jello,Toast.LENGTH_LONG).show();
-     }
-*/
 
 }

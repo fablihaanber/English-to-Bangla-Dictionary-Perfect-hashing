@@ -40,7 +40,7 @@
 
         <EditText
             android:id="@+id/input"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="14dp"
             android:textCursorDrawable="@drawable/color_cursor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,9 +48,9 @@
             android:backgroundTint="#feeffc"
             android:hint="Enter the word in English"
             android:textColorHint="#7b3c77"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="18dp"
             android:text=""
-            android:textSize="20sp"
+            android:textSize="26sp"
             android:maxLength="61"
 
             android:inputType="textEmailAddress"
@@ -63,12 +63,12 @@
             android:id="@+id/translate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="40dp"
-            android:padding="12dp"
+            android:layout_marginTop="44dp"
+            android:layout_marginBottom="50dp"
+            android:padding="22dp"
             android:text="Translate to Bangla"
             android:fontFamily="@font/berlin_sans_fb_regular"
-            android:textSize="18sp"
+            android:textSize="25sp"
             android:textColor="#feeffc"
             android:textAllCaps="false"
             android:backgroundTint="#7E0977"
@@ -79,11 +79,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:text="Word not found"
+            android:text="Meaning:"
             android:gravity="center"
-            android:textSize="19dp"
+            android:textSize="35dp"
             android:fontFamily="@font/berlin_sans_fb_regular"
             android:textColor="#813f7D"
+            android:visibility="invisible"
+
+            ></TextView>
+
+        <TextView
+            android:id="@+id/Foundword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:text=""
+            android:gravity="center"
+            android:textSize="35dp"
+            android:fontFamily="@font/berlin_sans_fb_regular"
+            android:textColor="#feeffc"
             android:visibility="invisible"
 
             ></TextView>
