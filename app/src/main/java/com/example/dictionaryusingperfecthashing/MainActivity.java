@@ -1,30 +1,15 @@
 package com.example.dictionaryusingperfecthashing;
-
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.example.dictionaryusingperfecthashing.R;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 class WordList{
     int size; //total size of json file or total words contained in it
@@ -38,14 +23,6 @@ class Hashtable{
     int length;
 
     Hashtable(int length){
-        this.length = length;
-    }
-
-    public int getLength() {
-        return length;
-    }
-
-    public void setLength(int length) {
         this.length = length;
     }
 
@@ -81,18 +58,6 @@ class Word{
 
     public String getEn() {
         return en;
-    }
-
-    public void setEn(String en) {
-        this.en = en;
-    }
-
-    public String getBn() {
-        return bn;
-    }
-
-    public void setBn(String bn) {
-        this.bn = bn;
     }
 
     public int getPrimaryHash() {
@@ -163,13 +128,8 @@ public class MainActivity extends AppCompatActivity {
                 word[i] = new Word(en,bn);  //assigning the values of en and bn to attributes en and bn of class word
 
             }
-            String c = word[1036].getEn();
-
-
 
             generateHashTable(dictionary.size);
-
-
 
         }catch (IOException e){
             e.printStackTrace();
@@ -177,30 +137,26 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-
-
         translate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 inputText[0] =input.getText().toString().toLowerCase();  //getting input from the text field
-                long stringKey = stringToNumber(inputText[0]);
-                long firstKey = getFirstKey(inputText[0]);
-                int primaryHash = getPrimaryHash(inputText[0],dictionary.size);
-                String str = String.valueOf(primaryHash);
                 String theWord = search(inputText[0],dictionary.size);
-                foundWord.setText(theWord);
-                foundWord.setVisibility(View.VISIBLE);
-                MeaningWord.setVisibility(View.VISIBLE);
+                if(theWord.equals("")){
+                    foundWord.setText("No word found");
+
+                }
+                else{
+                    foundWord.setText(theWord);
+                    foundWord.setVisibility(View.VISIBLE);
+                    MeaningWord.setVisibility(View.VISIBLE);
+                }
 
 
             }
         });
 
-
     }
-
-
 
     //this function will convert a word to a number
 
@@ -212,11 +168,7 @@ public class MainActivity extends AppCompatActivity {
             stringKey = ((stringKey*base)%prime+string.charAt(i))%prime;  //like cat = 99*256^2+97*256^1+116*256^0
 
         }
-
-
         return stringKey;
-
-
     }
 
     long getFirstKey(String string){
@@ -225,10 +177,7 @@ public class MainActivity extends AppCompatActivity {
         random_a = (long) (1+ Math.floor(Math.random()*(prime-1)));
         random_b = (long) Math.floor(Math.random()*prime);
 
-
-
         //if the hash table is being generated
-
         if(this.initiala == -1  || this.initialb == -1){
             this.initiala=random_a;
             this.initialb=random_b;
@@ -248,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
         BigInteger ak = a.multiply(stringk);
         BigInteger akplusb = ak.add(b);
         BigInteger p =BigInteger.valueOf(prime);
-        BigInteger Bigfirskey = akplusb.mod(p);  //ak+b
+        BigInteger Bigfirskey = akplusb.mod(p);  //(ak+b)%p
         long firstkey = Bigfirskey.longValue();
 
 
@@ -258,11 +207,9 @@ public class MainActivity extends AppCompatActivity {
         long firstkey = this.getFirstKey(string);
         BigInteger BigfirstKey = BigInteger.valueOf(firstkey);
         BigInteger dictionarysize = BigInteger.valueOf(m);
-        BigInteger BigprimaryHash = BigfirstKey.mod(dictionarysize);
+        BigInteger BigprimaryHash = BigfirstKey.mod(dictionarysize);  //((ak+b)%p)%m
         int primaryHash = BigprimaryHash.intValue();
 
-
-        //int primaryHash = (int)firstkey%m; //((ak+b)%p)%m where m is the size of the dictionary
         return primaryHash;
     }
 
@@ -279,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
         BigInteger p =BigInteger.valueOf(prime);
         BigInteger Bigsecondkey = ak1plusb.mod(p);  //(ak'+b)%p
         long secondkey = Bigsecondkey.longValue();
-
 
         return secondkey;
 
@@ -304,19 +250,16 @@ public class MainActivity extends AppCompatActivity {
     void generateHashTable(int dictionarySizey) {
 
         int dictionarySize = dictionarySizey;
-
-        //int[] count; //Count  will measure how many collisions are there where the keys have the same primary hash
         int maximumCollisions=0;
-
+        //Count  will measure how many collisions are there where the keys have the same primary hash
         count = new int[dictionarySize];
 
         for(int i=0;i<dictionarySize;i++){
-            count[i] = 0;
+            count[i] = 0;  // Initializing the count array
         }
 
         hashtable = new Hashtable[dictionarySize];
-        int[][] arrayCollidedWords = new int[dictionarySize][500]; //this array will store the indices of collided keys for that particullar hash function and the space 500 is specified randomly to avoid null reference
-
+        int[][] arrayCollidedWords = new int[dictionarySize][500]; //this array will store the indices of collided keys for that particular hash function and the space 500 is specified randomly to avoid null reference
 
         //looping through the indices of saved keys of dictionary
         for(int i=0;i<dictionarySize;i++){
@@ -336,18 +279,8 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        Toast.makeText(getApplicationContext(),word[1212].en,Toast.LENGTH_LONG).show();
-
-        int max = 0;
-
-
         int size = maximumCollisions*maximumCollisions;
         hash_arr = new int[dictionarySize][size+100];
-
-        String question = "";
-        int mamamama = 0;
-        //int question1 = 0;
-
 
         //looping through the hash indices of the hash table
         for(int j=0;j<dictionarySize;j++){
@@ -355,12 +288,8 @@ public class MainActivity extends AppCompatActivity {
 
             long a,b;
             int m;
-            //int primaryHash = word[j].primaryHash;
-            //SecondaryHashTable[] secondaryHash = new SecondaryHashTable()
-
             int length = count[j]*count[j]; //this length is the size of each slot in the hash table
             hashtable[j] = new Hashtable(length);
-
             m=length;
 
             if(count[j]>=1){
@@ -430,7 +359,6 @@ public class MainActivity extends AppCompatActivity {
             int key = hash_arr[inputPHash][0];
             String string = word[key].en;
             if(string.equals(searchWord)){
-                //Toast.makeText(getApplicationContext(),word[key].bn,Toast.LENGTH_LONG).show();
                 theWord = word[key].bn;
             }
 
@@ -444,7 +372,6 @@ public class MainActivity extends AppCompatActivity {
             int key = hash_arr[inputPHash][inputSHash];
             String string = word[key].en;
             if(string.equals(searchWord)){
-                //Toast.makeText(getApplicationContext(),word[key].bn,Toast.LENGTH_LONG).show();
                 theWord = word[key].bn;
             }
         }

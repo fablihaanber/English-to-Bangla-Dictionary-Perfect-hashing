@@ -4,11 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
-
-    android:background="@drawable/loginsignup"
-
     tools:context=".MainActivity">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background5"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,16 +29,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Dictionary!"
-
                 android:fontFamily="@font/berlin_sans_fb_regular"
-                android:textColor=" #fdddf9"
+                android:textColor="#ccf8f8"
                 android:textSize="40sp"
                 android:textStyle="bold"
                 ></TextView>
 
 
         </LinearLayout>
-   
+
 
         <EditText
             android:id="@+id/input"
@@ -44,10 +45,10 @@
             android:textCursorDrawable="@drawable/color_cursor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#feeffc"
+            android:textColor="#ccf8f8"
             android:backgroundTint="#feeffc"
             android:hint="Enter the word in English"
-            android:textColorHint="#7b3c77"
+            android:textColorHint="#006b6b"
             android:layout_marginBottom="18dp"
             android:text=""
             android:textSize="26sp"
@@ -69,9 +70,9 @@
             android:text="Translate to Bangla"
             android:fontFamily="@font/berlin_sans_fb_regular"
             android:textSize="25sp"
-            android:textColor="#feeffc"
+            android:textColor="#ccf8f8"
             android:textAllCaps="false"
-            android:backgroundTint="#7E0977"
+            android:backgroundTint="#0e9b92"
             ></Button>
 
         <TextView
@@ -83,7 +84,7 @@
             android:gravity="center"
             android:textSize="35dp"
             android:fontFamily="@font/berlin_sans_fb_regular"
-            android:textColor="#813f7D"
+            android:textColor="#007d7d"
             android:visibility="invisible"
 
             ></TextView>
@@ -95,21 +96,14 @@
             android:layout_marginBottom="24dp"
             android:text=""
             android:gravity="center"
-            android:textSize="35dp"
+            android:textSize="22dp"
             android:fontFamily="@font/berlin_sans_fb_regular"
-            android:textColor="#feeffc"
+            android:textColor="#ccf8f8"
             android:visibility="invisible"
 
             ></TextView>
 
     </LinearLayout>
-    //#40013d
-    <!--
-        <ProgressBar
-            android:id="@+id/progressbar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true" />-->
+
 
 </RelativeLayout>
